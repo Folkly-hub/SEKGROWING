@@ -11,6 +11,8 @@ let currentWeatherData = null;
 let isAwdActive = true;
 let samplePlotIndex = 0;
 let currentValidation = null;
+let carbonLayer = null;
+let carbonLayerActive = false;
 
 // ขอบเขตพิกัดประเทศไทย (Thailand Boundary Bounds)
 const THAILAND_BOUNDS = [
@@ -105,6 +107,84 @@ function initMap() {
   map.addLayer(drawnItems);
 
   setupDrawingTools();
+  setupCarbonLayer();
+}
+
+// 1b. ตั้งค่า Carbon Layer (NASA MODIS EVI via NASA GIBS)
+function setupCarbonLayer() {
+  carbonLayer = L.tileLayer.wms(
+    'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi',
+    {
+      layers: 'MODIS_Terra_EVI_8Day',
+      format: 'image/png',
+      transparent: true,
+      version: '1.3.0',
+      TIME: '2026-11-23',
+      crs: L.CRS.EPSG3857,
+      attribution: '🛰️ NASA MODIS Terra EVI · earthdata.nasa.gov',
+      opacity: 0.75,
+      bounds: L.latLngBounds([[5.5, 97.2], [20.6, 105.8]])
+    }
+  );
+
+  const btn = document.getElementById('btnCarbonLayer');
+  const legend = document.getElementById('carbonLegend');
+  if (!btn) return;
+
+  let maskLayer = null;
+
+  async function buildThaiMask() {
+    if (maskLayer) return maskLayer;
+    try {
+      const res = await fetch(
+        'https://nominatim.openstreetmap.org/search?country=thailand&polygon_geojson=1&format=json&limit=1',
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      const data = await res.json();
+      const geo = data[0]?.geojson;
+      if (!geo) return null;
+
+      const worldRing = [[-90,-180],[-90,180],[90,180],[90,-180]];
+      const rings = [worldRing];
+
+      const addRing = coords => rings.push(coords.map(c => [c[1], c[0]]));
+
+      if (geo.type === 'Polygon') {
+        addRing(geo.coordinates[0]);
+      } else if (geo.type === 'MultiPolygon') {
+        geo.coordinates.forEach(poly => addRing(poly[0]));
+      }
+
+      maskLayer = L.polygon(rings, {
+        color: 'none',
+        fillColor: '#09130c',
+        fillOpacity: 0.88,
+        interactive: false
+      });
+    } catch(e) {
+      console.error('Thailand boundary fetch failed', e);
+    }
+    return maskLayer;
+  }
+
+  btn.addEventListener('click', async () => {
+    carbonLayerActive = !carbonLayerActive;
+    if (carbonLayerActive) {
+      map.addLayer(carbonLayer);
+      btn.classList.add('active');
+      btn.innerHTML = '<span>⏳</span> กำลังโหลด...';
+      const mask = await buildThaiMask();
+      if (mask) map.addLayer(mask);
+      btn.innerHTML = '<span>🌿</span> ซ่อนแถบคาร์บอน';
+      if (legend) legend.style.display = 'block';
+    } else {
+      map.removeLayer(carbonLayer);
+      if (maskLayer) map.removeLayer(maskLayer);
+      btn.classList.remove('active');
+      btn.innerHTML = '<span>🌿</span> แถบสีคาร์บอน';
+      if (legend) legend.style.display = 'none';
+    }
+  });
 }
 
 // 2. เครื่องมือวาดแปลงนา
@@ -241,7 +321,7 @@ async function analyzePlot(layer, customPlotName = null) {
 
   // 4.5 คำนวณคาร์บอนตามสมการมาตรฐาน IPCC Tier-2 และผลประโยชน์ทางการเงิน
   const carbonStats = SekModels.calculateCarbonEmissions(currentAreaStats.raiDecimal, isAwdActive, currentWeatherData);
-  const financialStats = SekModels.calculateFinancialBenefits(currentAreaStats.raiDecimal, isAwdActive);
+  const financialStats = SekModels.calculateFinancialBenefits(currentAreaStats.raiDecimal, isAwdActive, carbonStats);
   const climateAlerts = SekModels.evaluateRisks(currentWeatherData);
 
   // 4.6 อัปเดต UI
@@ -250,6 +330,12 @@ async function analyzePlot(layer, customPlotName = null) {
   renderWealthTab(financialStats, carbonStats);
   renderClimateTab(climateAlerts);
   renderWeatherForecastStrip(currentWeatherData);
+
+  // แสดงปุ่มดูผลลัพธ์บนมือถือ
+  const mBtnResult = document.getElementById("mBtnViewResult");
+  if (mBtnResult && window.innerWidth <= 900) {
+    mBtnResult.style.display = "block";
+  }
 }
 
 // 5. แถบแสดงผลการตรวจสอบพื้นที่
@@ -310,8 +396,8 @@ function updateSummaryKPIs(carbon, finance) {
   document.getElementById("kpiReducedVal").innerText = isAwdActive ? `-${carbon.reductionPercent}%` : "0%";
   document.getElementById("kpiReducedSub").innerText = isAwdActive ? `ลดได้ ${carbon.carbonReducedTon} ตัน CO₂-eq` : "ปล่อยคาร์บอนเต็มพิกัด";
 
-  document.getElementById("kpiCarbonVal").innerText = `${carbon.co2EqPerRai} kg`;
-  document.getElementById("kpiCarbonSub").innerText = `CO₂-eq / ไร่ / ฤดูกาล`;
+  document.getElementById("kpiCarbonVal").innerText = `${carbon.co2EqTonTotal} ตัน`;
+  document.getElementById("kpiCarbonSub").innerText = `CO₂-eq รวม (${carbon.co2EqPerRai} kg/ไร่)`;
 
   document.getElementById("kpiBenefitVal").innerText = `฿${finance.totalBenefit.toLocaleString()}`;
   document.getElementById("kpiBenefitSub").innerText = `ต่อรอบปลูก (${currentAreaStats.raiDecimal} ไร่)`;
@@ -328,11 +414,11 @@ function renderCarbonTab(carbon) {
           <div class="carbon-hero-val">${carbon.co2EqTonTotal} <span style="font-size: 1.1rem; font-weight: 500;">ตัน CO₂-eq</span></div>
         </div>
         <div class="carbon-reduction-badge ${isAwdActive ? 'active' : ''}">
-          ${isAwdActive ? '🌱 ลดได้ 48%' : '⚠️ ปล่อยเต็มเกณฑ์'}
+          ${isAwdActive ? `🌱 ลดได้ ${carbon.reductionPercent}%` : '⚠️ ปล่อยเต็มเกณฑ์'}
         </div>
       </div>
       <div class="carbon-hero-meter">
-        <div class="carbon-meter-fill" style="width: ${isAwdActive ? '52%' : '100%'};"></div>
+        <div class="carbon-meter-fill" style="width: ${isAwdActive ? (100 - carbon.reductionPercent) : 100}%;"></div>
       </div>
       <div class="carbon-hero-sub">
         <span>มีเทนที่ปล่อย: ${carbon.methaneEmissionKg} kg CH₄</span>
@@ -442,7 +528,7 @@ function setupUIEventListeners() {
       isAwdActive = e.target.checked;
       if (currentLayer && currentValidation && currentValidation.isValidRiceField) {
         const carbon = SekModels.calculateCarbonEmissions(currentAreaStats.raiDecimal, isAwdActive, currentWeatherData);
-        const finance = SekModels.calculateFinancialBenefits(currentAreaStats.raiDecimal, isAwdActive);
+        const finance = SekModels.calculateFinancialBenefits(currentAreaStats.raiDecimal, isAwdActive, carbon);
         updateSummaryKPIs(carbon, finance);
         renderCarbonTab(carbon);
         renderWealthTab(finance, carbon);
@@ -450,16 +536,47 @@ function setupUIEventListeners() {
     });
   }
 
-  // แท็บสลับหน้าจอ
-  document.querySelectorAll(".tab-lux-btn").forEach(btn => {
+  // ปุ่มสลับมุมมองมือถือ (Mobile view switcher: แผนที่ vs ข้อมูลแปลง)
+  const mBtnMap = document.getElementById("mBtnMap");
+  const mBtnPanel = document.getElementById("mBtnPanel");
+  const mBtnResult = document.getElementById("mBtnViewResult");
+
+  if (mBtnMap && mBtnPanel) {
+    mBtnMap.addEventListener("click", () => {
+      document.body.classList.remove("show-panel-only");
+      document.body.classList.add("show-map-only");
+      mBtnMap.classList.add("active");
+      mBtnPanel.classList.remove("active");
+      if (currentAreaStats && mBtnResult) {
+        mBtnResult.style.display = "block";
+      }
+      setTimeout(() => { map.invalidateSize(); }, 200);
+    });
+    mBtnPanel.addEventListener("click", () => {
+      document.body.classList.remove("show-map-only");
+      document.body.classList.add("show-panel-only");
+      mBtnPanel.classList.add("active");
+      mBtnMap.classList.remove("active");
+      if (mBtnResult) mBtnResult.style.display = "none";
+    });
+  }
+
+  if (mBtnResult && mBtnPanel) {
+    mBtnResult.addEventListener("click", () => {
+      mBtnPanel.click();
+    });
+  }
+
+  // แท็บสลับหน้าจอใน Side Panel
+  document.querySelectorAll(".tab-nav-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
-      document.querySelectorAll(".tab-lux-btn").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-lux-content").forEach(tc => tc.classList.remove("active"));
+      document.querySelectorAll(".tab-nav-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(tc => tc.classList.remove("active"));
 
       const target = e.currentTarget;
       target.classList.add("active");
       const tabId = target.dataset.tab;
-      document.getElementById(tabId).classList.add("active");
+      document.getElementById(tabId)?.classList.add("active");
     });
   });
 

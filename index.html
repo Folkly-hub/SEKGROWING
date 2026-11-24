@@ -1,232 +1,220 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="show-map-only">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEK GROWING — แพลตฟอร์มบริหารคาร์บอนนาข้าวและการจัดการน้ำอัจฉริยะ (IPCC Tier-2)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SEK GROWING — ระบบบริหารคาร์บอนนาข้าว & การจัดการน้ำ (IPCC Standards)</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <!-- Leaflet Draw CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
 
-  <!-- App Custom Luxury Styles -->
+  <!-- App Custom Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="show-map-only">
 
-  <!-- 1. Luxury Navbar -->
-  <header class="navbar-lux">
-    <div class="brand-lux">
-      <div class="logo-orb">🌾</div>
-      <div class="brand-titles">
+  <!-- 1. Top Navbar -->
+  <header class="navbar-top">
+    <div class="brand-wrapper">
+      <div class="brand-icon">🌾</div>
+      <div class="brand-info">
         <h1>SEK GROWING</h1>
-        <span>
-          <span style="color: var(--emerald-glow); font-weight: 600;">● RICE CARBON INTELLIGENCE</span>
-          • ระบบบริหารคาร์บอนนาข้าว & การจัดการน้ำ (มาตรฐาน IPCC)
-        </span>
+        <span>ระบบบริหารคาร์บอนนาข้าวและการจัดการน้ำ (มาตรฐาน IPCC)</span>
       </div>
     </div>
 
-    <div class="scope-badge-lux">
-      <div class="status-dot-pulse"></div>
-      <span>🇹🇭 ขอบเขตราชอาณาจักรไทย (Thailand Only)</span>
+    <!-- ปุ่มสลับมุมมองสำหรับหน้าจอมือถือ/แท็บเล็ต -->
+    <div class="mobile-view-tabs">
+      <button class="m-tab-btn active" id="mBtnMap">🗺️ แผนที่</button>
+      <button class="m-tab-btn" id="mBtnPanel">📊 ข้อมูลแปลง</button>
+    </div>
+
+    <!-- ป้ายสถานะประเทศไทยบนจอคอม -->
+    <div class="scope-badge">
+      <div class="live-dot"></div>
+      <span>🇹🇭 สโคปเฉพาะประเทศไทย</span>
     </div>
   </header>
 
-  <!-- 2. Main Wrapper -->
+  <!-- 2. Main Split Wrapper -->
   <div class="main-wrapper">
 
-    <!-- แผนที่ดาวเทียมประเทศไทย (สโคปเฉพาะประเทศไทย) -->
+    <!-- แผนที่ดาวเทียมประเทศไทย (เต็มความสูง) -->
     <div id="map"></div>
 
-    <!-- แถบเครื่องมือลอยเหนือแผนที่ สไตล์ Luxury Glassmorphism -->
-    <div class="map-floating-bar-lux">
-      <button class="tool-btn-lux" id="btnDrawPlot" title="คลิกวาดตามแนวคันนาจริง">
+    <!-- แถบเครื่องมือลอยเหนือแผนที่ -->
+    <div class="map-floating-bar">
+      <button class="tool-btn" id="btnDrawPlot" title="คลิกวาดตามแนวคันนาจริง">
         <span>✏️</span> วาดแปลงนา
       </button>
-      <button class="tool-btn-lux" id="btnDrawCircle" title="ลากวงกลมครอบคลุมพื้นที่">
+      <button class="tool-btn" id="btnDrawCircle" title="ลากวงกลมครอบคลุมพื้นที่">
         <span>⭕</span> วงเลือกพื้นที่
       </button>
-      <div class="tool-divider-lux"></div>
-      <button class="tool-btn-lux" id="btnSamplePlot" title="สลับแปลงตัวอย่าง (เกษตร / บ้านเรือน / แหล่งน้ำ)">
+      <div class="tool-divider"></div>
+      <button class="tool-btn" id="btnSamplePlot" title="สลับแปลงตัวอย่าง">
         <span>🔄</span> สลับแปลงตัวอย่าง
       </button>
-      <button class="tool-btn-lux" id="btnResetView" title="รีเซ็ตมุมมองประเทศไทย">
+      <button class="tool-btn" id="btnResetView" title="รีเซ็ตมุมมองประเทศไทย">
         <span>🗺️</span> ภาพรวมประเทศไทย
+      </button>
+      <div class="tool-divider"></div>
+      <button class="tool-btn carbon-toggle-btn" id="btnCarbonLayer" title="แสดง/ซ่อน แถบสีคาร์บอน (NASA MODIS NPP)">
+        <span>🌿</span> แถบสีคาร์บอน
       </button>
     </div>
 
-    <!-- แถบแนะนำการใช้งานลอยด้านล่าง -->
-    <div class="draw-hint-box-lux" id="drawHintBox">
-      <span>💡</span> คลิกที่ปุ่ม <strong>"วาดแปลงนา"</strong> หรือ <strong>"วงเลือกพื้นที่"</strong> เพื่อตรวจสอบแปลงนาของคุณ
+    <!-- กล่องแนะนำการใช้งานลอยด้านล่าง -->
+    <div class="draw-hint" id="drawHintBox">
+      <span>💡</span> คลิกที่ปุ่ม <strong>"วาดแปลงนา"</strong> หรือ <strong>"วงเลือกพื้นที่"</strong> เพื่อตรวจสอบแปลงของคุณ
     </div>
 
-    <!-- 3. แผงควบคุมข้อมูลด้านข้าง สไตล์ Luxury Obsidian Side Panel -->
-    <aside class="side-panel-lux">
+    <!-- ปุ่มลอยดูผลวิเคราะห์สำหรับมือถือเมื่อวาดเสร็จ -->
+    <button class="mobile-view-result-btn" id="mBtnViewResult" style="display: none;">
+      📊 ดูผลวิเคราะห์แปลงนี้ &rarr;
+    </button>
 
-      <!-- ส่วนหัวแปลงและขนาดพื้นที่ -->
-      <div class="panel-header-lux">
-        <h2 class="plot-title-lux" id="plotTitle">กำลังโหลดข้อมูลแปลง...</h2>
-        <div class="plot-area-lux">
+    <!-- 3. แผงควบคุมข้อมูลด้านข้าง (Side Panel) -->
+    <aside class="side-panel">
+
+      <!-- หัวข้อแปลงและขนาดพื้นที่ -->
+      <div class="panel-header">
+        <h2 class="plot-name" id="plotTitle">กำลังโหลดข้อมูลแปลง...</h2>
+        <div class="plot-area-row">
           <span>ขนาดพื้นที่:</span>
           <strong id="plotAreaText">-- ไร่ -- งาน -- ตร.ว.</strong>
-          <span id="plotSqMetersText" style="color: #64748b; font-size: 0.8rem;">(-- ตร.ม.)</span>
+          <span id="plotSqMetersText" style="color: #94a3b8; font-size: 0.8rem;">(-- ตร.ม.)</span>
         </div>
 
-        <!-- แถบตรวจสอบความถูกต้องของแปลงนา (Land Validation AI Banner) -->
-        <div class="validation-banner success" id="validationBanner">
+        <!-- กล่องตรวจสอบความถูกต้องของแปลงนา (Land Validation) -->
+        <div class="validation-card success" id="validationBanner">
           <div class="val-icon">✅</div>
-          <div class="val-info">
+          <div class="val-content">
             <h4>กำลังตรวจสอบพื้นที่...</h4>
-            <p>ระบบกำลังสแกนโครงสร้างพื้นที่ด้วยดาวเทียม</p>
+            <p>ระบบกำลังสแกนโครงสร้างพื้นที่</p>
           </div>
         </div>
       </div>
 
-      <!-- Quick KPI 4 ช่อง สไตล์กระจกหรูหรา -->
-      <div class="kpi-grid-lux">
-        <div class="kpi-card-lux emerald">
-          <span class="kpi-label-lux">💧 การจัดการน้ำ</span>
-          <span class="kpi-val-lux" id="kpiStatusVal" style="font-size: 1.05rem;">เปียกสลับแห้ง</span>
-          <span class="kpi-sub-lux" id="kpiStatusSub">ลดมีเทน 48%</span>
+      <!-- Quick KPI 4 ช่อง -->
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <span class="kpi-title">💧 การจัดการน้ำ</span>
+          <span class="kpi-value emerald" id="kpiStatusVal" style="font-size: 1.05rem;">เปียกสลับแห้ง</span>
+          <span class="kpi-subtitle" id="kpiStatusSub">ลดมีเทน 48%</span>
         </div>
-        <div class="kpi-card-lux gold">
-          <span class="kpi-label-lux">🌱 คาร์บอนที่ลดได้</span>
-          <span class="kpi-val-lux" id="kpiReducedVal">-48%</span>
-          <span class="kpi-sub-lux" id="kpiReducedSub">เทียบกรณีขังน้ำปกติ</span>
+        <div class="kpi-box">
+          <span class="kpi-title">🌱 คาร์บอนที่ลดได้</span>
+          <span class="kpi-value gold" id="kpiReducedVal">-48%</span>
+          <span class="kpi-subtitle" id="kpiReducedSub">เทียบกรณีขังน้ำปกติ</span>
         </div>
-        <div class="kpi-card-lux blue">
-          <span class="kpi-label-lux">💨 ปริมาณคาร์บอน/ไร่</span>
-          <span class="kpi-val-lux" id="kpiCarbonVal">-- kg</span>
-          <span class="kpi-sub-lux" id="kpiCarbonSub">CO₂-eq / ฤดูกาล</span>
+        <div class="kpi-box">
+          <span class="kpi-title">💨 ปริมาณคาร์บอน/ไร่</span>
+          <span class="kpi-value" id="kpiCarbonVal">-- kg</span>
+          <span class="kpi-subtitle" id="kpiCarbonSub">CO₂-eq / ฤดูกาล</span>
         </div>
-        <div class="kpi-card-lux gold">
-          <span class="kpi-label-lux">💰 รวมผลประโยชน์</span>
-          <span class="kpi-val-lux" id="kpiBenefitVal">฿--</span>
-          <span class="kpi-sub-lux" id="kpiBenefitSub">ประหยัด + โบนัสขาย</span>
+        <div class="kpi-box">
+          <span class="kpi-title">💰 รวมผลประโยชน์</span>
+          <span class="kpi-value gold" id="kpiBenefitVal">฿--</span>
+          <span class="kpi-subtitle" id="kpiBenefitSub">ประหยัด + โบนัสขาย</span>
         </div>
       </div>
 
-      <!-- แถบสลับแท็บเมนู -->
-      <nav class="panel-tabs-lux">
-        <button class="tab-lux-btn active" data-tab="tab-carbon">
+      <!-- แถบสลับแท็บ -->
+      <nav class="tabs-bar">
+        <button class="tab-nav-btn active" data-tab="tab-carbon">
           <span>💨</span> จัดการน้ำ & คาร์บอน
         </button>
-        <button class="tab-lux-btn" data-tab="tab-wealth">
+        <button class="tab-nav-btn" data-tab="tab-wealth">
           <span>💰</span> เงินในกระเป๋า
         </button>
-        <button class="tab-lux-btn" data-tab="tab-weather">
-          <span>🌤️</span> สภาพอากาศ & เตือนภัย
+        <button class="tab-nav-btn" data-tab="tab-weather">
+          <span>🌤️</span> สภาพอากาศ 7 วัน
         </button>
       </nav>
 
       <!-- เนื้อหาภายในแท็บ -->
-      <div class="panel-body-lux">
+      <div class="panel-body">
 
-        <!-- ─────────────────────────────────────────────── -->
-        <!-- แท็บ 1: การจัดการน้ำและคาร์บอน (IPCC Model) -->
-        <!-- ─────────────────────────────────────────────── -->
-        <div class="tab-lux-content active" id="tab-carbon">
+        <!-- แท็บ 1: จัดการน้ำ & คาร์บอน -->
+        <div class="tab-pane active" id="tab-carbon">
           
-          <!-- สวิตช์สลับ: เปียกสลับแห้ง vs ขังน้ำต่อเนื่อง -->
-          <div class="awd-switch-box-lux">
+          <div class="awd-box">
             <div>
               <h4>💧 เทคนิคเปียกสลับแห้ง (AWD)</h4>
               <p>ปล่อยน้ำแห้งเป็นช่วงๆ ให้ออกซิเจนลงสู่ดิน ลดมีเทนทันที 48%</p>
             </div>
             <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
               <input type="checkbox" id="awdToggleCheckbox" checked style="width: 20px; height: 20px; accent-color: #10b981; cursor: pointer;">
-              <span style="font-size: 0.85rem; font-weight: 700; color: #34d399;">เปิดใช้งาน</span>
+              <span style="font-size: 0.82rem; font-weight: 700; color: #34d399;">เปิดใช้งาน</span>
             </label>
           </div>
 
-          <!-- กล่องสรุปการปล่อยคาร์บอนและตาราง AWD -->
           <div id="carbonBreakdownBox">
             <!-- Rendered via JavaScript -->
           </div>
 
         </div>
 
-        <!-- ─────────────────────────────────────────────── -->
-        <!-- แท็บ 2: เครื่องคำนวณผลประโยชน์ทางการเงิน (Wealth) -->
-        <!-- ─────────────────────────────────────────────── -->
-        <div class="tab-lux-content" id="tab-wealth">
+        <!-- แท็บ 2: เงินในกระเป๋า -->
+        <div class="tab-pane" id="tab-wealth">
           
-          <div class="wealth-hero-lux">
-            <div class="wealth-title">ประมาณการผลประโยชน์ทางการเงินรวมต่อรอบปลูก</div>
-            <div class="wealth-amount" id="totalWealthVal">฿0</div>
-            <div class="wealth-sub">จากการจัดการน้ำเปียกสลับแห้งและขายข้าวคาร์บอนต่ำ</div>
+          <div class="wealth-hero">
+            <div style="font-size: 0.82rem; color: #fef3c7;">ประมาณการผลประโยชน์ทางการเงินรวมต่อรอบปลูก</div>
+            <div class="wealth-big-amount" id="totalWealthVal">฿0</div>
+            <div style="font-size: 0.75rem; color: #fde68a;">จากการจัดการน้ำเปียกสลับแห้งและขายข้าวคาร์บอนต่ำ</div>
           </div>
 
-          <div class="luxury-box">
-            <div class="box-header">
+          <div class="info-section">
+            <div class="info-section-title">
               <span>แจกแจงที่มาของรายได้และเงินประหยัด</span>
-              <span class="status-pill green">คำนวณตามจริง</span>
+              <span style="font-size: 0.72rem; color: #34d399; background: rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 6px;">คำนวณตามจริง</span>
             </div>
 
-            <!-- รายการที่ 1: ประหยัดค่าน้ำมันปั๊มน้ำ -->
-            <div class="wealth-item">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="wealth-item-icon" style="background: rgba(2, 132, 199, 0.2); color: #38bdf8;">⛽</div>
-                <div class="wealth-item-text">
-                  <h5>ประหยัดค่าน้ำมันวิดน้ำเข้านา</h5>
-                  <p>ลดรอบการสูบน้ำขังตลอดฤดูกาล (~750 บาท/ไร่)</p>
-                </div>
+            <div class="wealth-line-item">
+              <div class="wealth-item-info">
+                <h5>⛽ ประหยัดค่าน้ำมันวิดน้ำ</h5>
+                <p>ลดรอบการสูบน้ำขังตลอดฤดู (~750 บาท/ไร่)</p>
               </div>
-              <div class="wealth-item-val" id="fuelSavingsVal">+฿0</div>
+              <div class="wealth-item-number" id="fuelSavingsVal">+฿0</div>
             </div>
 
-            <!-- รายการที่ 2: คาร์บอนเครดิต -->
-            <div class="wealth-item">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="wealth-item-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">🌱</div>
-                <div class="wealth-item-text">
-                  <h5>รายได้คาร์บอนเครดิต (T-VER)</h5>
-                  <p>ลดได้ <span id="carbonCreditTonsText" style="color: #34d399; font-weight: 600;">0 ตัน</span> (ราคาประเมิน 600 บาท/ตัน)</p>
-                </div>
+            <div class="wealth-line-item">
+              <div class="wealth-item-info">
+                <h5>🌱 รายได้คาร์บอนเครดิต (T-VER)</h5>
+                <p>ลดได้ <span id="carbonCreditTonsText" style="color: #34d399; font-weight: 600;">0 ตัน</span> (ประเมิน 600 บาท/ตัน)</p>
               </div>
-              <div class="wealth-item-val" id="carbonCreditVal">+฿0</div>
+              <div class="wealth-item-number" id="carbonCreditVal">+฿0</div>
             </div>
 
-            <!-- รายการที่ 3: โบนัสราคาข้าวพรีเมียม -->
-            <div class="wealth-item">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="wealth-item-icon" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">🌾</div>
-                <div class="wealth-item-text">
-                  <h5>โบนัสราคาข้าวรักษ์โลก (Low-Carbon)</h5>
-                  <p>โรงสีรับซื้อบวกเพิ่ม +400 บาท/ตัน (<span id="yieldTonsText">-- ตัน</span>)</p>
-                </div>
+            <div class="wealth-line-item">
+              <div class="wealth-item-info">
+                <h5>🌾 โบนัสราคาข้าวรักษ์โลก (Low-Carbon)</h5>
+                <p>โรงสีรับซื้อบวกเพิ่ม +400 บาท/ตัน (<span id="yieldTonsText">-- ตัน</span>)</p>
               </div>
-              <div class="wealth-item-val" id="ricePremiumVal">+฿0</div>
+              <div class="wealth-item-number" id="ricePremiumVal">+฿0</div>
             </div>
-          </div>
-
-          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); padding: 14px; border-radius: 12px; font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
-            ✨ <strong>สิทธิประโยชน์ข้าวคาร์บอนต่ำ:</strong> ข้าวที่ผ่านการทำเปียกสลับแห้ง (AWD) จะมีลำต้นแข็งแรง ไม่ล้มง่ายเมื่อมีพายุ และสามารถขอใบรับรองเพื่อขายเข้าตลาดพรีเมียมในราคาสูงกว่าตลาดทั่วไป
           </div>
 
         </div>
 
-        <!-- ─────────────────────────────────────────────── -->
-        <!-- แท็บ 3: พยากรณ์อากาศจริง & เรดาร์เตือนภัย 7 วัน -->
-        <!-- ─────────────────────────────────────────────── -->
-        <div class="tab-lux-content" id="tab-weather">
+        <!-- แท็บ 3: สภาพอากาศ 7 วัน -->
+        <div class="tab-pane" id="tab-weather">
           
-          <div class="luxury-box">
-            <div class="box-header">
+          <div class="info-section">
+            <div class="info-section-title">
               <span>🌤️ พยากรณ์อากาศ 7 วัน (เจาะจงพิกัดแปลงนา)</span>
-              <span class="status-pill green">สดจากดาวเทียมตรวจอากาศ</span>
+              <span style="font-size: 0.72rem; color: #38bdf8;">ข้อมูลจริงจากดาวเทียม</span>
             </div>
-            <div class="weather-forecast-strip-lux" id="weatherStrip">
+            <div class="weather-strip-container" id="weatherStrip">
               <!-- Rendered via JavaScript -->
             </div>
           </div>
 
-          <div class="luxury-box" style="margin-top: 14px;">
-            <div class="box-header">
+          <div class="info-section">
+            <div class="info-section-title">
               <span>⚠️ เรดาร์เตือนภัยสภาพอากาศและศัตรูพืช</span>
-              <span class="status-pill green">ประมวลผลล่วงหน้า 7 วัน</span>
             </div>
             <div id="climateAlertsList">
               <!-- Rendered via JavaScript -->
@@ -239,6 +227,18 @@
 
     </aside>
 
+  </div>
+
+  <!-- Carbon Layer Legend (hidden by default) -->
+  <div class="carbon-legend" id="carbonLegend" style="display:none;">
+    <div class="carbon-legend-title">🛰️ ความสมบูรณ์พืช = การดูดซับคาร์บอน (NASA MODIS EVI)</div>
+    <div class="carbon-legend-bar"></div>
+    <div class="carbon-legend-labels">
+      <span>น้อย/แห้งแล้ง</span>
+      <span>ปานกลาง</span>
+      <span>สมบูรณ์/ดูดซับสูง</span>
+    </div>
+    <div class="carbon-legend-source">แหล่งอ้างอิง: <a href="https://earthdata.nasa.gov/learn/find-data/near-real-time/modis-terra-evi" target="_blank" style="color:#34d399;">NASA MODIS Terra EVI (MOD13Q1) · earthdata.nasa.gov</a></div>
   </div>
 
   <!-- Leaflet JS -->
