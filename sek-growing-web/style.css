@@ -1,0 +1,813 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-deep: #060d09;
+  --bg-card: rgba(13, 27, 19, 0.88);
+  --bg-card-hover: rgba(18, 38, 27, 0.95);
+  --border-lux: rgba(52, 211, 153, 0.18);
+  --border-glow: rgba(52, 211, 153, 0.45);
+  --emerald-main: #10b981;
+  --emerald-glow: #34d399;
+  --emerald-deep: #064e3b;
+  --gold-main: #f59e0b;
+  --gold-glow: #fbbf24;
+  --danger-main: #ef4444;
+  --danger-glow: #f87171;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --blue-main: #0284c7;
+  --blue-glow: #38bdf8;
+  --text-pure: #ffffff;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --glass-blur: blur(20px);
+  --shadow-lux: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --glow-emerald: 0 0 25px rgba(16, 185, 129, 0.28);
+  --glow-gold: 0 0 25px rgba(245, 158, 11, 0.35);
+  --glow-danger: 0 0 25px rgba(239, 68, 68, 0.35);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Prompt', 'Outfit', sans-serif;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-pure);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Ultra Luxury Navbar ─── */
+.navbar-lux {
+  height: 72px;
+  background: rgba(6, 13, 9, 0.92);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border-lux);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 1000;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.brand-lux {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-orb {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #059669, #10b981, #f59e0b);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+  position: relative;
+  animation: pulse-glow 3s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+  100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.65), 0 0 15px rgba(245, 158, 11, 0.4); }
+}
+
+.brand-titles h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #ffffff 30%, #34d399 70%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.15;
+}
+
+.brand-titles span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scope-badge-lux {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: var(--emerald-glow);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}
+
+.status-dot-pulse {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulse-dot 1.8s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* ─── Main Content Layout ─── */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  position: relative;
+  height: calc(100vh - 72px);
+  overflow: hidden;
+}
+
+#map {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  background: #030705;
+}
+
+/* ─── Floating Luxury Map Bar ─── */
+.map-floating-bar-lux {
+  position: absolute;
+  top: 20px;
+  left: 60px;
+  z-index: 500;
+  display: flex;
+  gap: 10px;
+  background: rgba(10, 20, 14, 0.88);
+  backdrop-filter: var(--glass-blur);
+  padding: 8px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border-lux);
+  box-shadow: var(--shadow-lux), var(--glow-emerald);
+}
+
+.tool-btn-lux {
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 9px 15px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e2e8f0;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+}
+
+.tool-btn-lux:hover {
+  background: rgba(16, 185, 129, 0.18);
+  color: var(--emerald-glow);
+  border-color: rgba(52, 211, 153, 0.4);
+  transform: translateY(-1px);
+}
+
+.tool-divider-lux {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: auto 4px;
+}
+
+/* ─── Side Panel (Luxury Obsidian Drawer) ─── */
+.side-panel-lux {
+  width: 520px;
+  height: 100%;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--border-lux);
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 50px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.panel-header-lux {
+  padding: 20px 24px;
+  background: rgba(6, 15, 10, 0.95);
+  border-bottom: 1px solid var(--border-lux);
+}
+
+.plot-title-lux {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin-top: 4px;
+}
+
+.plot-area-lux {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.plot-area-lux strong {
+  color: var(--emerald-glow);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ─── Land Validation Alert Banner ─── */
+.validation-banner {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.validation-banner.success {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.18);
+}
+
+.validation-banner.danger {
+  background: var(--danger-bg);
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: var(--glow-danger);
+  animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+  0% { border-color: rgba(239, 68, 68, 0.4); }
+  50% { border-color: rgba(239, 68, 68, 0.85); box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
+  100% { border-color: rgba(239, 68, 68, 0.4); }
+}
+
+.validation-banner.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: var(--glow-gold);
+}
+
+.val-icon {
+  font-size: 24px;
+  margin-top: -2px;
+}
+
+.val-icon.spin {
+  animation: spin-icon 2s linear infinite;
+}
+
+@keyframes spin-icon {
+  100% { transform: rotate(360deg); }
+}
+
+.val-info h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.validation-banner.success .val-info h4 { color: #34d399; }
+.validation-banner.danger .val-info h4 { color: #f87171; }
+.validation-banner.warning .val-info h4 { color: #fbbf24; }
+
+.val-info p {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.val-tag {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-muted);
+}
+
+/* ─── Luxury KPI Cards Grid ─── */
+.kpi-grid-lux {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 18px 24px;
+  background: rgba(8, 18, 12, 0.7);
+  border-bottom: 1px solid var(--border-lux);
+}
+
+.kpi-card-lux {
+  background: rgba(18, 36, 26, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.kpi-card-lux:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-glow);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.kpi-card-lux::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.kpi-card-lux.emerald::before { background: var(--emerald-glow); box-shadow: 0 0 10px var(--emerald-glow); }
+.kpi-card-lux.gold::before { background: var(--gold-glow); box-shadow: 0 0 10px var(--gold-glow); }
+.kpi-card-lux.blue::before { background: var(--blue-glow); box-shadow: 0 0 10px var(--blue-glow); }
+.kpi-card-lux.purple::before { background: #a855f7; box-shadow: 0 0 10px #a855f7; }
+
+.kpi-label-lux {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.kpi-val-lux {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.kpi-card-lux.gold .kpi-val-lux {
+  color: #fbbf24;
+  text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
+.kpi-sub-lux {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ─── Luxury Tabs ─── */
+.panel-tabs-lux {
+  display: flex;
+  border-bottom: 1px solid var(--border-lux);
+  background: rgba(6, 14, 9, 0.95);
+}
+
+.tab-lux-btn {
+  flex: 1;
+  padding: 14px 10px;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-lux-btn:hover {
+  color: var(--emerald-glow);
+}
+
+.tab-lux-btn.active {
+  color: #ffffff;
+  border-bottom-color: var(--emerald-glow);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* ─── Scrollable Panel Body ─── */
+.panel-body-lux {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.tab-lux-content {
+  display: none;
+}
+
+.tab-lux-content.active {
+  display: block;
+}
+
+/* ─── Luxury Carbon Hero Card ─── */
+.carbon-hero-card {
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--border-lux);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.carbon-hero-card.green {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.8), rgba(16, 185, 129, 0.2));
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: var(--glow-emerald);
+}
+
+.carbon-hero-card.amber {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.8), rgba(245, 158, 11, 0.2));
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: var(--glow-gold);
+}
+
+.carbon-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.carbon-hero-label {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.carbon-hero-val {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-top: 4px;
+  letter-spacing: -0.5px;
+}
+
+.carbon-reduction-badge {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.carbon-reduction-badge.active {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+}
+
+.carbon-hero-meter {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  margin: 16px 0 10px 0;
+  overflow: hidden;
+}
+
+.carbon-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399, #fbbf24);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.carbon-hero-sub {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
+
+/* ─── AWD Switch Box ─── */
+.awd-switch-box-lux {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  padding: 16px 20px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.awd-switch-box-lux h4 {
+  font-size: 0.95rem;
+  color: #34d399;
+  font-weight: 700;
+}
+
+.awd-switch-box-lux p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ─── Luxury Boxes ─── */
+.luxury-box {
+  background: rgba(15, 30, 22, 0.75);
+  border: 1px solid var(--border-lux);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.status-pill {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.status-pill.green {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+}
+
+.awd-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.schedule-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.schedule-item.highlight {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.schedule-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  height: fit-content;
+}
+
+.schedule-badge.active {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.schedule-text {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+/* ─── Wealth Card & Breakdown ─── */
+.wealth-hero-lux {
+  background: linear-gradient(135deg, rgba(146, 64, 14, 0.8), rgba(245, 158, 11, 0.25));
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: var(--glow-gold);
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.wealth-title {
+  font-size: 0.85rem;
+  color: #fef3c7;
+  letter-spacing: 0.5px;
+}
+
+.wealth-amount {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin: 6px 0;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+}
+
+.wealth-sub {
+  font-size: 0.78rem;
+  color: #fde68a;
+}
+
+.wealth-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wealth-item:last-child {
+  border-bottom: none;
+}
+
+.wealth-item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.wealth-item-text h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.wealth-item-text p {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.wealth-item-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+/* ─── Climate Alerts Luxury ─── */
+.alert-card-luxury {
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid;
+}
+
+.alert-card-luxury.danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.alert-card-luxury.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.alert-card-luxury.safe {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(52, 211, 153, 0.45);
+}
+
+.alert-title-lux {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.alert-card-luxury.danger .alert-title-lux { color: #f87171; }
+.alert-card-luxury.warning .alert-title-lux { color: #fbbf24; }
+.alert-card-luxury.safe .alert-title-lux { color: #34d399; }
+
+.alert-desc-lux {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.alert-action-lux {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: #e2e8f0;
+}
+
+/* ─── Weather Strip Luxury ─── */
+.weather-forecast-strip-lux {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.weather-day-lux {
+  flex: 0 0 76px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.w-date {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.w-icon {
+  font-size: 24px;
+  margin: 6px 0;
+}
+
+.w-temp {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.w-rain {
+  font-size: 0.68rem;
+  color: #38bdf8;
+  margin-top: 2px;
+}
+
+/* ─── Empty state & Alerts ─── */
+.alert-box-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 10px;
+}
+
+.draw-hint-box-lux {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(6, 13, 9, 0.92);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 500;
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-lux);
+  box-shadow: var(--shadow-lux), var(--glow-emerald);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.6);
+}
+
+@media (max-width: 900px) {
+  .main-wrapper { flex-direction: column; }
+  .side-panel-lux { width: 100%; height: 55%; border-left: none; border-top: 1px solid var(--border-lux); }
+  #map { height: 45%; }
+  .map-floating-bar-lux { left: 10px; top: 10px; }
+}
